@@ -1,0 +1,10 @@
+**/data
+**/*.jsonl
+staging
+.verification-cache
+.git
+.claude
+evidence
+runner
+workspaces
+*.exe
