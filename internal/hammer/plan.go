@@ -32,7 +32,7 @@ func NewPlan(zone, upstreamID, downstreamID string, step float64, pre, post int)
 // OrderedValveIDs returns the stroke order required by water-hammer
 // protection: the upstream valve closes first, then the downstream valve.
 func (p Plan) OrderedValveIDs() []string {
-	return []string{p.DownstreamID, p.UpstreamID}
+	return []string{p.UpstreamID, p.DownstreamID}
 }
 
 // Steps converts the protection order into executable valve steps.
