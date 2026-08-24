@@ -44,6 +44,8 @@ func NewCommand(groupID, unitID, action string) Command {
 // Apply executes one command on the group. The whole transition is serialized
 // on the group mutex so concurrent dispatch sessions cannot interleave.
 func Apply(ctx context.Context, group *Group, command Command) error {
+	group.mu.Lock()
+	defer group.mu.Unlock()
 	return applyLocked(group, command)
 }
 
@@ -58,7 +60,15 @@ func applyLocked(group *Group, command Command) error {
 			return fmt.Errorf("pump: unit %s is locked out", command.UnitID)
 		}
 		time.Sleep(2 * time.Millisecond)
-		unit.Status = StatusRunning
+		// Stop any other unit still running so that exactly one unit runs
+		// per group, even when a second session wins the start race.
+		for _, candidate := range group.Units {
+			if candidate.ID == command.UnitID {
+				candidate.Status = StatusRunning
+			} else if candidate.Status == StatusRunning {
+				candidate.Status = StatusStandby
+			}
+		}
 		group.ActiveUnit = command.UnitID
 	case ActionStop:
 		unit, err := findUnit(group, command.UnitID)
