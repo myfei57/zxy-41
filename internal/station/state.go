@@ -56,7 +56,8 @@ func (s *Station) Refresh(ctx context.Context) error {
 	return s.Save()
 }
 
-// PumpStatuses exposes the live statuses for the failover view.
+// PumpStatuses exposes the live statuses. Failover reads this on every switch
+// decision so a recovered primary is visible immediately.
 func (s *Station) PumpStatuses(ctx context.Context) (map[string]pump.Status, error) {
 	state, err := s.CurrentState(ctx)
 	if err != nil {
@@ -65,7 +66,8 @@ func (s *Station) PumpStatuses(ctx context.Context) (map[string]pump.Status, err
 	return state.PumpStatuses, nil
 }
 
-// CachedPumpStatuses exposes the snapshot statuses for the failover view.
+// CachedPumpStatuses exposes the snapshot statuses captured by the last
+// refresh cycle. This is for display only; failover reads PumpStatuses live.
 func (s *Station) CachedPumpStatuses(ctx context.Context) (map[string]pump.Status, error) {
 	state, err := s.CachedState(ctx)
 	if err != nil {
