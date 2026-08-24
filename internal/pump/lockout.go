@@ -41,6 +41,7 @@ func ClearLockout(ctx context.Context, group *Group, unitID string) error {
 	if err != nil {
 		return err
 	}
+	unit.Locked = false
 	if unit.Status == StatusMaintenance {
 		unit.Status = StatusStandby
 	}
