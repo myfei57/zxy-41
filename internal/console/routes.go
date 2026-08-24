@@ -1,0 +1,70 @@
+package console
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+)
+
+func (s *Server) routes(router chi.Router) {
+	router.Get("/healthz", s.handleHealth)
+	router.Route("/api/v1", func(api chi.Router) {
+		api.Get("/namespaces", s.handleNamespaces)
+		api.Get("/zones/{zoneID}", s.handleZone)
+		api.Get("/stations/{id}", s.handleStation)
+		api.Post("/stations/{id}/tanks/{tankID}/fill", s.handleTankFill)
+		api.Get("/pumps", s.handlePumps)
+		api.Get("/pumps/{id}", s.handlePump)
+		api.Post("/pumps/{id}/maintenance", s.handlePumpMaintenance)
+		api.Post("/pumps/{id}/release", s.handlePumpRelease)
+		api.Post("/pumps/{id}/start", s.handlePumpStart)
+		api.Post("/pumps/{id}/stop", s.handlePumpStop)
+		api.Post("/pumps/{id}/discharge", s.handlePumpDischarge)
+		api.Post("/pumps/{id}/target", s.handlePumpTarget)
+		api.Post("/pumps/{id}/status", s.handlePumpStatus)
+		api.Post("/pumps/{id}/vibration", s.handlePumpVibration)
+		api.Post("/pumps/{id}/preflight", s.handlePumpPreflight)
+		api.Post("/pumps/{id}/trip", s.handlePumpTrip)
+		api.Post("/pumps/{id}/commands-batch", s.handlePumpCommandsBatch)
+		api.Post("/pumps/{id}/failover", s.handleFailover)
+		api.Get("/valves", s.handleValves)
+		api.Get("/valves/{id}", s.handleValve)
+		api.Post("/valves/{id}/zone", s.handleValveZone)
+		api.Post("/valves/{id}/close", s.handleValveClose)
+		api.Post("/valves/{id}/close-fully", s.handleValveCloseFully)
+		api.Post("/valves/{id}/open", s.handleValveOpen)
+		api.Post("/valves/{id}/detach", s.handleValveDetach)
+		api.Post("/valves/protect", s.handleValveProtect)
+		api.Get("/valves/{id}/protection", s.handleValveProtection)
+		api.Post("/pressure/samples", s.handleSample)
+		api.Post("/pressure/sample-batch", s.handleSampleBatch)
+		api.Get("/pressure/windows/{zone}", s.handlePressureWindows)
+		api.Post("/pressure/adjust", s.handlePressureAdjust)
+		api.Post("/pressure/adjust-batch", s.handlePressureAdjustBatch)
+		api.Post("/dispatch/session", s.handleDispatchSession)
+		api.Post("/dispatch/commands", s.handleDispatchCommand)
+		api.Post("/dispatch/queue", s.handleDispatchQueue)
+		api.Get("/dispatch/queue", s.handleDispatchQueueStatus)
+		api.Post("/dispatch/queue/reset", s.handleDispatchQueueReset)
+		api.Post("/dispatch/apply", s.handleDispatchApply)
+		api.Post("/policy/decide-batch", s.handlePolicyDecideBatch)
+		api.Post("/policy/evaluate", s.handlePolicyEvaluate)
+		api.Get("/policy", s.handlePolicyList)
+		api.Post("/policy", s.handlePolicySet)
+		api.Post("/policy/save", s.handlePolicySave)
+		api.Get("/meters/{id}", s.handleMeter)
+		api.Post("/meters/{id}/direction", s.handleMeterDirection)
+		api.Post("/meters/{id}/flow", s.handleMeterFlow)
+		api.Get("/audit", s.handleAudit)
+		api.Get("/audit/summary", s.handleAuditSummary)
+		api.Get("/audit/raw", s.handleAuditRaw)
+		api.Get("/quota/{zone}", s.handleQuota)
+		api.Get("/executions", s.handleExecutions)
+		api.Get("/state", s.handleState)
+		api.Get("/store/files", s.handleStoreFiles)
+	})
+}
+
+func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok", "service": "waternet"})
+}
